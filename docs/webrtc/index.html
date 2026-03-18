@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Video — SKComm Docs</title>
+    <meta name="description" content="WebRTC Video documentation for SKComm">
+    <link rel="canonical" href="https://skcomm.io/docs/webrtc/">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-deep: #0f172a; --bg-card: #1e293b; --bg-code: #0d1117;
+            --border: #334155; --text: #e2e8f0; --text-dim: #94a3b8;
+            --accent: #8b5cf6; --accent-glow: #a78bfa;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body { font-family: var(--font-body); background: var(--bg-deep); color: var(--text); line-height: 1.7; }
+        a { color: var(--accent-glow); text-decoration: none; }
+        a:hover { color: var(--text); }
+        .nav { position: sticky; top: 0; z-index: 100; background: rgba(15,23,42,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+        .nav-inner { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo { font-size: 1.4rem; font-weight: 800; color: var(--text); text-decoration: none; }
+        .nav-logo span { color: var(--accent); }
+        .nav-links { list-style: none; display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a { color: var(--text-dim); font-size: .9rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-glow); }
+        .layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 220px 1fr; gap: 3rem; padding: 2rem; }
+        .sidebar { position: sticky; top: 80px; align-self: start; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin-bottom: .5rem; }
+        .sidebar a { color: var(--text-dim); font-size: .9rem; display: block; padding: .4rem .8rem; border-radius: 6px; }
+        .sidebar a:hover, .sidebar a.active { color: var(--accent-glow); background: rgba(59,130,246,.1); }
+        .content { min-width: 0; }
+        .content h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 1.5rem; }
+        .content h2 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .content h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 .75rem; }
+        .content h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 .5rem; }
+        .content p { margin-bottom: 1rem; color: var(--text); }
+        .content ul, .content ol { margin: 0 0 1rem 1.5rem; }
+        .content li { margin-bottom: .4rem; }
+        .content pre { background: var(--bg-code); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+        .content code { font-family: var(--font-mono); font-size: .85rem; }
+        .content p code, .content li code { background: var(--bg-code); padding: .15rem .4rem; border-radius: 4px; font-size: .85rem; }
+        .content hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+        .content strong { color: var(--text); font-weight: 600; }
+        .table-wrap { overflow-x: auto; margin: 1rem 0; }
+        .content table { border-collapse: collapse; width: 100%; }
+        .content td { padding: .5rem .75rem; border: 1px solid var(--border); font-size: .9rem; }
+        .content tr:nth-child(odd) { background: rgba(30,41,59,.5); }
+        .footer { text-align: center; padding: 3rem 2rem; color: var(--text-dim); font-size: .85rem; border-top: 1px solid var(--border); margin-top: 4rem; }
+        @media (max-width: 768px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">SK<span>Comm</span></a>
+    <ul class="nav-links">
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="https://github.com/smilinTux/skcomm">GitHub →</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="layout">
+    <aside class="sidebar">
+        <ul>
+            <li><a href="/docs/architecture/" >Architecture</a></li><li><a href="/docs/key-exchange/" >Key Exchange SOP</a></li><li><a href="/docs/webrtc/" class="active">WebRTC Video</a></li>
+        </ul>
+    </aside>
+    <main class="content">
+        <h1>WebRTC Video Track Architecture for MuseTalk Avatar Streaming</h1>
+<p><strong>Author</strong>: Opus (Claude Code) + Chef (David)</p>
+<p><strong>Date</strong>: March 18, 2026</p>
+<p><strong>Status</strong>: DESIGN — Phase 2 of Sovereign FaceTime</p>
+<h2>Overview</h2>
+<p>This document describes the architecture for streaming MuseTalk-generated avatar</p>
+<p>video frames from the GPU server (192.168.0.100) to the browser over WebRTC,</p>
+<p>combined with TTS audio in a single <code>RTCPeerConnection</code>. The design extends the</p>
+<p>existing SKComm WebRTC transport (currently data-channel-only) to support media</p>
+<p>tracks while preserving CapAuth-signed SDP offers, TURN relay via</p>
+<p>turn.skworld.io, and the sovereign signaling broker.</p>
+<h2>Architecture Diagram</h2>
+<pre><code class="language-">
+Browser (WebRTC consumer)
+    |
+    |  RTCPeerConnection
+    |    - VideoTrack (H.264 or VP8 from MuseTalk frames)
+    |    - AudioTrack (Opus-encoded TTS audio)
+    |    - DataChannel "skcomm" (control messages, captions, emotion metadata)
+    |
+    |  ICE: STUN → direct LAN / TURN relay (turn.skworld.io)
+    |  SDP: CapAuth PGP-signed, via /webrtc/ws signaling broker
+    |
+    ▼
+GPU Server (192.168.0.100) — aiortc RTCPeerConnection
+    |
+    ├─ MuseTalkVideoTrack (VideoStreamTrack subclass)
+    |    - Receives RGBA/BGR frames from MuseTalk inference
+    |    - Converts to av.VideoFrame (yuv420p)
+    |    - Yields at 20 FPS with proper PTS/time_base
+    |
+    ├─ TTSAudioTrack (AudioStreamTrack subclass)
+    |    - Receives PCM from Chatterbox TTS
+    |    - Chunks into 20ms Opus frames (960 samples @ 48kHz)
+    |    - Yields av.AudioFrame with monotonic timestamps
+    |
+    └─ DataChannel "skcomm" (existing)
+         - Transcript text, emotion state, control signals
+</code></pre>
+<h2>1. Creating a Video MediaStreamTrack from MuseTalk Frames</h2>
+<h3>MuseTalk Output Format</h3>
+<p>MuseTalk produces BGR numpy arrays (OpenCV format), typically 256x256 or</p>
+<p>512x512, at 15-20 FPS depending on GPU load. Each inference call takes the</p>
+<p>current audio segment and a reference portrait, producing a lip-synced frame.</p>
+<h3>Frame Pipeline</h3>
+<pre><code class="language-">
+MuseTalk inference (BGR numpy, 256x256)
+    → cv2.resize to 720x720 or 1280x720
+    → cv2.cvtColor BGR→RGB
+    → av.VideoFrame.from_ndarray(rgb, format="rgb24")
+    → frame.reformat(format="yuv420p")  # WebRTC-required colorspace
+    → yield from VideoStreamTrack.recv()
+</code></pre>
+<h3>Key Design Decisions</h3>
+<p>1. <strong>Resolution</strong>: 720p (1280x720) for full-screen, 480p (854x480) for</p>
+<p>bandwidth-constrained. MuseTalk native resolution (256x256) is upscaled with</p>
+<p>bilinear interpolation. The avatar is composited onto a background template</p>
+<p>at the target resolution.</p>
+<p>2. <strong>Frame rate</strong>: Target 20 FPS. MuseTalk can sustain this on RTX 5060 Ti.</p>
+<p>If inference falls behind, the track repeats the last frame (freeze rather</p>
+<p>than skip) to maintain smooth PTS progression.</p>
+<p>3. <strong>Colorspace</strong>: yuv420p is mandatory for WebRTC. All frames must be</p>
+<p>reformatted before yielding.</p>
+<p>4. <strong>Thread safety</strong>: MuseTalk inference runs in a dedicated thread/process.</p>
+<p>Frames are passed to the aiortc track via an <code>asyncio.Queue</code> with a max</p>
+<p>depth of 3 frames (60ms at 20 FPS) to bound memory and latency.</p>
+<h2>2. Codec Selection: H.264 vs VP8 vs VP9</h2>
+<div class="table-wrap"><table>
+<tr><td>Codec</td><td>Browser Support</td><td>HW Encode (RTX 5060)</td><td>Latency</td><td>Bandwidth</td><td>Recommendation</td></tr>
+<tr><td>H.264</td><td>Universal (all browsers + mobile)</td><td>NVENC available</td><td>Lowest</td><td>Best at low bitrate</td><td>**Primary**</td></tr>
+<tr><td>VP8</td><td>Chrome, Firefox, Edge</td><td>No HW encode</td><td>Low</td><td>Good</td><td>**Fallback**</td></tr>
+<tr><td>VP9</td><td>Chrome, Firefox, Edge</td><td>NVENC limited</td><td>Higher (more compression)</td><td>Best</td><td>Not recommended for real-time</td></tr>
+</table></div>
+<h3>Recommendation: H.264 Primary, VP8 Fallback</h3>
+<ul>
+<li><strong>H.264 Baseline Profile</strong>: Supported everywhere. aiortc uses x264 by default</li>
+</ul>
+<p>(software encode). NVENC hardware encoding is possible by building a custom</p>
+<p>encoder, but software x264 at 720p@20fps is well within CPU budget.</p>
+<ul>
+<li><strong>VP8</strong>: aiortc default codec. Good fallback if H.264 negotiation fails.</li>
+<li><strong>VP9</strong>: Too much encode latency for real-time avatar streaming. Skip.</li>
+</ul>
+<h3>SDP Codec Preference</h3>
+<p>When creating the offer, prefer H.264 by reordering the codec list:</p>
+<pre><code class="language-python">
+from aiortc import RTCRtpSender
+
+# Force H.264 preference in SDP
+capabilities = RTCRtpSender.getCapabilities("video")
+h264_codecs = [c for c in capabilities.codecs if "H264" in c.mimeType]
+other_codecs = [c for c in capabilities.codecs if "H264" not in c.mimeType]
+# Transceiver preference: H.264 first
+transceiver.setCodecPreferences(h264_codecs + other_codecs)
+</code></pre>
+<h2>3. aiortc VideoStreamTrack Implementation</h2>
+<p>aiortc provides <code>MediaStreamTrack</code> as the base class, with <code>VideoStreamTrack</code></p>
+<p>as the convenience subclass for video. The key method to override is <code>recv()</code></p>
+<p>which must return an <code>av.VideoFrame</code> with correct timing.</p>
+<h3>Timing Model</h3>
+<p>aiortc expects <code>recv()</code> to be called in a loop. The track must:</p>
+<p>1. Set <code>frame.pts</code> to a monotonically increasing value.</p>
+<p>2. Set <code>frame.time_base</code> to <code>fractions.Fraction(1, VIDEO_CLOCK_RATE)</code> where</p>
+<p><code>VIDEO_CLOCK_RATE = 90000</code> (standard RTP video clock).</p>
+<p>3. Pace itself to the target FPS. If <code>recv()</code> returns too fast, frames</p>
+<p>pile up in the jitter buffer. If too slow, the browser sees freezes.</p>
+<h3>Frame Pacing Strategy</h3>
+<p>The track maintains a wall-clock start time and computes the expected PTS for</p>
+<p>each frame. If a new MuseTalk frame is not ready, the previous frame is</p>
+<p>re-yielded with an updated PTS (frame repeat). If inference is faster than</p>
+<p>real-time, frames are dropped.</p>
+<pre><code class="language-">
+PTS = (frame_count * VIDEO_CLOCK_RATE) // TARGET_FPS
+expected_wall = start_time + (frame_count / TARGET_FPS)
+actual_wall = time.monotonic()
+if actual_wall &lt; expected_wall:
+    await asyncio.sleep(expected_wall - actual_wall)
+</code></pre>
+<h3>Idle Frame</h3>
+<p>When no speech is being synthesized (TTS silent), the avatar should still be</p>
+<p>"alive" with subtle idle animation (blinking, slight head movement). Options:</p>
+<ul>
+<li><strong>Static portrait</strong>: Lowest cost. Just yield the same frame.</li>
+<li><strong>Idle loop</strong>: Pre-rendered 3-5 second loop of subtle movement (blink cycle).</li>
+</ul>
+<p>Cycles continuously. MuseTalk can generate this from silence audio.</p>
+<ul>
+<li><strong>Live idle</strong>: Run MuseTalk with ambient noise input for organic micro-movements.</li>
+</ul>
+<p>Recommendation: Start with static portrait, add idle loop in Phase 3.</p>
+<h2>4. Combining Audio + Video in a Single RTCPeerConnection</h2>
+<h3>Track Addition Order</h3>
+<pre><code class="language-python">
+from aiortc import RTCPeerConnection
+
+pc = RTCPeerConnection(configuration=rtc_config)
+
+# Add video track (MuseTalk avatar)
+video_track = MuseTalkVideoTrack(frame_queue, fps=20)
+pc.addTrack(video_track)
+
+# Add audio track (TTS output)
+audio_track = TTSAudioTrack(audio_queue, sample_rate=48000)
+pc.addTrack(audio_track)
+
+# Create data channel for text/control (existing pattern)
+channel = pc.createDataChannel("skcomm", ordered=True)
+</code></pre>
+<h3>Audio Track Details</h3>
+<p>aiortc audio uses Opus codec (mandatory in WebRTC). The audio track must</p>
+<p>yield <code>av.AudioFrame</code> objects:</p>
+<ul>
+<li><strong>Sample rate</strong>: 48000 Hz (Opus native)</li>
+<li><strong>Frame duration</strong>: 20ms (960 samples) — standard Opus frame</li>
+<li><strong>Layout</strong>: mono (avatar speech is mono)</li>
+<li><strong>Format</strong>: s16 (16-bit signed PCM)</li>
+</ul>
+<p>TTS engines (Chatterbox, Piper) output at various sample rates (22050, 24000,</p>
+<p>44100). The audio track resamples to 48kHz before framing.</p>
+<h3>Synchronization</h3>
+<p>Audio-video sync is handled by aiortc's RTP timestamp system. As long as both</p>
+<p>tracks maintain accurate PTS relative to their respective clock rates (48000</p>
+<p>for audio, 90000 for video), the browser's jitter buffer handles lip-sync.</p>
+<p>For MuseTalk specifically: the audio chunk that drives lip-sync inference is</p>
+<p>the *same* audio being sent on the audio track. This gives inherent sync —</p>
+<p>the video frames are generated *from* the audio, so they are naturally aligned.</p>
+<p>The critical path is:</p>
+<p>1. TTS generates audio chunk (e.g., 500ms of speech).</p>
+<p>2. Audio chunk is enqueued to both the audio track AND MuseTalk.</p>
+<p>3. MuseTalk generates N video frames from that chunk.</p>
+<p>4. Both tracks yield their frames with aligned timestamps.</p>
+<h3>Pipeline Coordination</h3>
+<pre><code class="language-python">
+async def on_tts_chunk(audio_pcm: bytes, start_pts: int):
+    """Called when TTS produces a chunk of audio."""
+    # Feed to audio track for WebRTC
+    await audio_queue.put(audio_pcm)
+
+    # Feed to MuseTalk for lip-sync frame generation
+    frames = await musetalk.generate_frames(audio_pcm, portrait)
+    for frame in frames:
+        await video_frame_queue.put(frame)
+</code></pre>
+<h2>5. Browser-Side: Receiving and Rendering WebRTC Video + Audio</h2>
+<h3>Signaling Flow (Extends Existing)</h3>
+<p>The browser connects to the signaling broker at <code>/webrtc/ws</code> using the same</p>
+<p>protocol as the existing data-channel flow. The only difference is that the</p>
+<p>SDP offer from the server now includes video and audio media descriptions</p>
+<p>in addition to the data channel.</p>
+<pre><code class="language-javascript">
+// Connect to signaling broker (existing pattern)
+const ws = new WebSocket("wss://skchat.skworld.io/webrtc/ws?room=skcomm-CCBE..&peer=BROWSER_FP");
+
+// Create peer connection with TURN
+const pc = new RTCPeerConnection({
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "turn:turn.skworld.io:3478", username: hmacUser, credential: hmacCred }
+    ]
+});
+
+// Handle incoming tracks
+pc.ontrack = (event) =&gt; {
+    const stream = event.streams[0];
+    if (event.track.kind === "video") {
+        document.getElementById("avatar-video").srcObject = stream;
+    } else if (event.track.kind === "audio") {
+        document.getElementById("avatar-audio").srcObject = stream;
+    }
+};
+
+// Handle data channel (existing pattern)
+pc.ondatachannel = (event) =&gt; {
+    const dc = event.channel;
+    dc.onmessage = (e) =&gt; {
+        const msg = JSON.parse(e.data);
+        if (msg.type === "transcript") updateCaptions(msg);
+        if (msg.type === "emotion") updateEmotionUI(msg);
+    };
+};
+</code></pre>
+<h3>HTML Structure</h3>
+<pre><code class="language-html">
+&lt;div id="facetime-container"&gt;
+    &lt;!-- Avatar video (from MuseTalk) --&gt;
+    &lt;video id="avatar-video" autoplay playsinline muted&gt;&lt;/video&gt;
+
+    &lt;!-- Avatar audio (from TTS) — separate element for volume control --&gt;
+    &lt;audio id="avatar-audio" autoplay&gt;&lt;/audio&gt;
+
+    &lt;!-- Captions overlay (from data channel) --&gt;
+    &lt;div id="captions-overlay"&gt;&lt;/div&gt;
+
+    &lt;!-- User's camera (optional, Phase 3) --&gt;
+    &lt;video id="user-camera" autoplay playsinline muted&gt;&lt;/video&gt;
+&lt;/div&gt;
+</code></pre>
+<p>Note: The video element has <code>muted</code> because avatar audio comes from the</p>
+<p>separate <code><audio></code> element. This avoids autoplay restrictions (muted video</p>
+<p>autoplays without user gesture, audio requires a user interaction first).</p>
+<h3>Autoplay Policy Handling</h3>
+<p>Browsers block autoplay of audio. The UI must have a "Start Call" button</p>
+<p>that triggers a user gesture:</p>
+<pre><code class="language-javascript">
+document.getElementById("start-call").onclick = async () =&gt; {
+    // User gesture unlocks audio playback
+    const audioEl = document.getElementById("avatar-audio");
+    await audioEl.play();  // Unlocks audio context
+
+    // Now initiate WebRTC
+    await startSignaling();
+};
+</code></pre>
+<h2>6. Latency Considerations</h2>
+<h3>End-to-End Latency Budget</h3>
+<div class="table-wrap"><table>
+<tr><td>Stage</td><td>Time</td><td>Notes</td></tr>
+<tr><td>User speech → STT</td><td>200-500ms</td><td>SenseVoice on GPU</td></tr>
+<tr><td>STT → LLM response start</td><td>200-500ms</td><td>Anthropic streaming</td></tr>
+<tr><td>LLM → TTS first audio chunk</td><td>200-400ms</td><td>Chatterbox streaming</td></tr>
+<tr><td>TTS → MuseTalk first frame</td><td>50-100ms</td><td>Single frame inference</td></tr>
+<tr><td>WebRTC encode + transmit</td><td>50-150ms</td><td>LAN: 50ms, WAN+TURN: 150ms</td></tr>
+<tr><td>Browser jitter buffer</td><td>50-100ms</td><td>Adaptive, typically 2-3 frames</td></tr>
+<tr><td>**Total (first frame visible)**</td><td>**750-1750ms**</td><td></td></tr>
+</table></div>
+<h3>Optimization Strategies</h3>
+<p>1. <strong>Streaming TTS</strong>: Don't wait for full utterance. Generate audio in chunks</p>
+<p>(sentence by sentence) and start MuseTalk + WebRTC delivery for the first</p>
+<p>chunk while later chunks are still being synthesized.</p>
+<p>2. <strong>Jitter buffer tuning</strong>: aiortc's default jitter buffer is conservative.</p>
+<p>For LAN use, reduce <code>RTCConfiguration.iceTransportPolicy</code> and consider</p>
+<p>setting <code>playoutDelayHint</code> on the browser side.</p>
+<p>3. <strong>Frame dropping</strong>: If MuseTalk falls behind, drop frames rather than</p>
+<p>queuing them. A 1-frame queue (latest frame wins) prevents accumulating</p>
+<p>latency.</p>
+<p>4. <strong>Idle preload</strong>: When the user starts speaking (VAD triggers), pre-warm</p>
+<p>MuseTalk by generating idle frames. This ensures the GPU pipeline is hot</p>
+<p>when real lip-sync frames are needed.</p>
+<p>5. <strong>Keyframe interval</strong>: Set keyframe interval to 2 seconds (40 frames at</p>
+<p>20 FPS). Frequent keyframes help with recovery after packet loss but</p>
+<p>increase bandwidth. Tune based on network conditions.</p>
+<h3>Buffering Strategy</h3>
+<pre><code class="language-">
+Server side:
+    MuseTalk → asyncio.Queue(maxsize=2)  → VideoStreamTrack.recv()
+    TTS PCM  → asyncio.Queue(maxsize=10) → AudioStreamTrack.recv()
+
+    Video queue is intentionally small (2 frames = 100ms at 20 FPS).
+    Older frames are dropped if queue is full (latest-wins).
+
+    Audio queue is larger (10 frames = 200ms at 20ms/frame) because
+    audio discontinuity is more perceptible than video frame drops.
+
+Browser side:
+    RTCPeerConnection → MediaStream → &lt;video&gt; / &lt;audio&gt; elements
+    Browser handles its own jitter buffer (typically 50-150ms).
+    No additional application-level buffering needed.
+</code></pre>
+<h2>7. Bandwidth Requirements</h2>
+<h3>Video Bandwidth (720p @ 20 FPS, H.264)</h3>
+<p>Avatar video is *extremely* compressible because:</p>
+<ul>
+<li>The background is static (only the face region changes).</li>
+<li>Frame-to-frame delta is small (lip movements, not full motion).</li>
+<li>The source resolution is upscaled from 256x256 (low spatial detail).</li>
+</ul>
+<div class="table-wrap"><table>
+<tr><td>Quality</td><td>Bitrate</td><td>Monthly (1hr/day)</td><td>Notes</td></tr>
+<tr><td>Low (480p, q28)</td><td>200-400 kbps</td><td>~5 GB</td><td>Adequate for avatar</td></tr>
+<tr><td>Medium (720p, q24)</td><td>500-800 kbps</td><td>~12 GB</td><td>**Recommended**</td></tr>
+<tr><td>High (720p, q20)</td><td>1-1.5 Mbps</td><td>~22 GB</td><td>Diminishing returns for avatar</td></tr>
+</table></div>
+<h3>Audio Bandwidth (Opus)</h3>
+<div class="table-wrap"><table>
+<tr><td>Quality</td><td>Bitrate</td><td>Notes</td></tr>
+<tr><td>Speech</td><td>24-32 kbps</td><td>Default Opus for speech, excellent quality</td></tr>
+<tr><td>Wideband</td><td>48-64 kbps</td><td>Overkill for TTS avatar speech</td></tr>
+</table></div>
+<h3>Total Bandwidth</h3>
+<p><strong>Recommended</strong>: 500-800 kbps video + 32 kbps audio = <strong>~600-850 kbps</strong></p>
+<p>This is well within LAN capacity and comfortable over WAN. For comparison,</p>
+<p>a standard Zoom call uses 1.5-3 Mbps for video.</p>
+<h3>Adaptive Bitrate</h3>
+<p>aiortc supports bandwidth estimation. The video encoder can be configured</p>
+<p>to adapt:</p>
+<pre><code class="language-python">
+# In the video transceiver
+sender = pc.getSenders()[0]  # video sender
+params = sender.getParameters()
+params.encodings[0].maxBitrate = 800_000  # 800 kbps
+await sender.setParameters(params)
+</code></pre>
+<h2>8. Fallback: WebSocket Binary Frames</h2>
+<p>If WebRTC is unavailable (strict corporate firewall blocking STUN/TURN,</p>
+<p>aiortc not installed, etc.), fall back to WebSocket binary streaming.</p>
+<h3>Fallback Protocol</h3>
+<pre><code class="language-">
+Browser → WS /ws/facetime/{agent}
+
+Server sends:
+    Binary frames: MJPEG-encoded video frames (JPEG per frame)
+    Text frames:   JSON control messages (same as data channel protocol)
+
+Frame format (binary):
+    [4 bytes: frame_type (0x01=video, 0x02=audio)]
+    [4 bytes: timestamp_ms (uint32 LE)]
+    [4 bytes: payload_length (uint32 LE)]
+    [N bytes: payload]
+
+    Video payload: JPEG-encoded frame (quality 75, ~15-30 KB per frame at 720p)
+    Audio payload: Opus-encoded packet (from opuslib)
+</code></pre>
+<h3>Bandwidth Impact</h3>
+<p>MJPEG over WebSocket is ~3-5x less efficient than H.264 over WebRTC:</p>
+<ul>
+<li>Each frame is independently compressed (no inter-frame prediction).</li>
+<li>No RTP-level congestion control.</li>
+<li>WebSocket framing overhead.</li>
+</ul>
+<p>At 720p@20fps: MJPEG = ~3-5 Mbps vs H.264 = ~600 kbps.</p>
+<p>At 480p@15fps: MJPEG = ~1.5-2.5 Mbps — acceptable for LAN fallback.</p>
+<h3>When to Fall Back</h3>
+<pre><code class="language-javascript">
+async function connectFaceTime(agentName) {
+    try {
+        // Try WebRTC first
+        await connectWebRTC(agentName);
+    } catch (e) {
+        console.warn("WebRTC failed, falling back to WebSocket:", e);
+        // ICE failed, or aiortc not available on server
+        connectWebSocketFallback(agentName);
+    }
+}
+</code></pre>
+<h2>9. Integration Points with Existing SKComm / skchat</h2>
+<h3>SKComm WebRTC Transport Extension</h3>
+<p>The existing <code>WebRTCTransport</code> in <code>skcomm/transports/webrtc.py</code> only creates</p>
+<p>data channels. The video/audio tracks are a separate concern — they belong</p>
+<p>in a new <code>FaceTimeSession</code> class that uses the same signaling infrastructure</p>
+<p>but creates its own <code>RTCPeerConnection</code> with media tracks.</p>
+<p><strong>Do NOT modify the existing WebRTCTransport.</strong> It serves a different purpose</p>
+<p>(reliable ordered messaging). Instead, create a parallel media session class</p>
+<p>that reuses:</p>
+<ul>
+<li>The signaling broker (<code>/webrtc/ws</code> room protocol)</li>
+<li>ICE server configuration (<code>_build_ice_servers()</code>)</li>
+<li>TURN credential derivation (<code>_derive_turn_credentials()</code>)</li>
+<li>CapAuth SDP signing</li>
+</ul>
+<h3>New Files (Proposed)</h3>
+<div class="table-wrap"><table>
+<tr><td>File</td><td>Purpose</td></tr>
+<tr><td>`skcomm/transports/webrtc_media.py`</td><td>`FaceTimeSession` — media track management</td></tr>
+<tr><td>`skcomm/transports/video_track.py`</td><td>`MuseTalkVideoTrack` — aiortc VideoStreamTrack</td></tr>
+<tr><td>`skcomm/transports/audio_track.py`</td><td>`TTSAudioTrack` — aiortc AudioStreamTrack</td></tr>
+<tr><td>`skchat/facetime.py`</td><td>`FaceTimeManager` — session lifecycle, MuseTalk coordination</td></tr>
+<tr><td>`skchat/static/facetime.html`</td><td>Browser UI</td></tr>
+<tr><td>`skchat/static/facetime.js`</td><td>WebRTC client logic</td></tr>
+</table></div>
+<h3>SKVoice Integration</h3>
+<p>SKVoice (192.168.0.100:18800) currently handles the full voice pipeline. For</p>
+<p>FaceTime, SKVoice gains a new endpoint:</p>
+<pre><code class="language-">
+WS /ws/facetime/{agent_name}
+</code></pre>
+<p>This endpoint:</p>
+<p>1. Runs the voice pipeline (STT → LLM → TTS) as today.</p>
+<p>2. Feeds TTS audio to both the WebRTC audio track AND MuseTalk.</p>
+<p>3. MuseTalk frames go to the WebRTC video track.</p>
+<p>4. The WebRTC peer connection is managed locally on the GPU box.</p>
+<p>skchat remains a thin proxy:</p>
+<pre><code class="language-">
+Browser ↔ skchat (WS proxy) ↔ SKVoice GPU (WebRTC origination)
+</code></pre>
+<p>Wait — this is wrong. WebRTC should originate from wherever has the media.</p>
+<p>Two architectures are possible:</p>
+<p><strong>Option A: WebRTC from GPU box (recommended)</strong></p>
+<ul>
+<li>Browser connects directly to GPU box for WebRTC (STUN/ICE handles NAT).</li>
+<li>Signaling goes through skchat/skcomm broker (lightweight).</li>
+<li>GPU box has the video frames and audio — no extra hop.</li>
+<li>TURN relay handles cases where direct connection fails.</li>
+</ul>
+<p><strong>Option B: WebRTC from skchat gateway, media proxied from GPU</strong></p>
+<ul>
+<li>skchat originates the WebRTC connection.</li>
+<li>Video/audio frames are streamed from GPU to skchat via internal WS/gRPC.</li>
+<li>skchat encodes and sends via WebRTC.</li>
+<li>Adds latency and CPU load on the gateway box.</li>
+</ul>
+<p><strong>Decision: Option A.</strong> The GPU box runs the aiortc peer connection.</p>
+<p>Signaling (SDP/ICE exchange) routes through the existing broker. Media</p>
+<p>flows directly between GPU box and browser via ICE.</p>
+<h3>Signaling Protocol Extension</h3>
+<p>Add a new signal type to the <code>/webrtc/ws</code> protocol:</p>
+<pre><code class="language-json">
+{
+    "type": "signal",
+    "to": "&lt;browser_fingerprint&gt;",
+    "data": {
+        "sdp": "...",
+        "type": "offer",
+        "media_type": "facetime"  // NEW: distinguishes from data-only offers
+    }
+}
+</code></pre>
+<p>The browser uses <code>media_type</code> to know this SDP includes video/audio tracks</p>
+<p>and should be rendered in the FaceTime UI rather than handled as a data</p>
+<p>channel connection.</p>
+<h2>10. Security Considerations</h2>
+<p>All existing security properties are preserved:</p>
+<ul>
+<li><strong>CapAuth SDP signing</strong>: SDP offers/answers carry PGP signatures over the</li>
+</ul>
+<p>SDP text. The DTLS fingerprint in the SDP is bound to the signature.</p>
+<p>Video/audio tracks use the same DTLS-SRTP encryption as data channels.</p>
+<ul>
+<li><strong>TURN authentication</strong>: HMAC-SHA1 time-limited credentials via</li>
+</ul>
+<p><code>_derive_turn_credentials()</code>. No change needed.</p>
+<ul>
+<li><strong>No media through signaling relay</strong>: The signaling broker only sees</li>
+</ul>
+<p>encrypted SDP/ICE messages. All media (video, audio) flows directly</p>
+<p>between peers via DTLS-SRTP.</p>
+<ul>
+<li><strong>Browser fingerprint</strong>: In Phase 3 (bidirectional video), the browser's</li>
+</ul>
+<p>camera stream is encrypted end-to-end via DTLS-SRTP. The server never</p>
+<p>has access to unencrypted camera frames unless explicitly forwarded.</p>
+<h2>Appendix: MuseTalk Integration Notes</h2>
+<h3>MuseTalk API (Expected)</h3>
+<p>MuseTalk is typically run as a Python module. For integration, wrap it in a</p>
+<p>simple async interface:</p>
+<pre><code class="language-python">
+class MuseTalkEngine:
+    """Wraps MuseTalk inference for real-time lip-sync generation."""
+
+    async def load(self, portrait_path: str) -&gt; None:
+        """Load a reference portrait for the current agent."""
+
+    async def generate_frames(
+        self, audio_pcm: bytes, sample_rate: int = 16000
+    ) -&gt; list[np.ndarray]:
+        """Generate lip-synced video frames from audio.
+
+        Args:
+            audio_pcm: Raw PCM audio (16-bit, mono).
+            sample_rate: Audio sample rate.
+
+        Returns:
+            List of BGR numpy arrays (one per frame at target FPS).
+        """
+
+    async def get_idle_frame(self) -&gt; np.ndarray:
+        """Return a single idle (mouth closed) portrait frame."""
+</code></pre>
+<h3>Portrait Management</h3>
+<p>Each agent has a portrait stored at:</p>
+<pre><code class="language-">
+~/.skcapstone/agents/{agent}/avatar/portrait.png
+</code></pre>
+<p>The portrait is loaded once when a FaceTime session starts. MuseTalk uses</p>
+<p>it as the reference face for all lip-sync generation in that session.</p>
+<h3>VRAM Sharing</h3>
+<p>MuseTalk requires ~4-6 GB VRAM. When combined with Chatterbox TTS (~2-3 GB)</p>
+<p>and SenseVoice STT (~2-3 GB), total is ~10 GB — within the 16 GB budget</p>
+<p>of the RTX 5060 Ti.</p>
+<p>ComfyUI must be unloaded during FaceTime sessions (or use VRAM offloading).</p>
+<p>A simple mutex/semaphore in SKVoice can prevent VRAM contention:</p>
+<pre><code class="language-python">
+gpu_semaphore = asyncio.Semaphore(1)
+
+async def start_facetime():
+    await gpu_semaphore.acquire()
+    # Load MuseTalk, reserve VRAM
+    ...
+
+async def stop_facetime():
+    # Unload MuseTalk, free VRAM
+    gpu_semaphore.release()
+</code></pre>
+    </main>
+</div>
+<footer class="footer">
+    <p>SKComm is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
+</footer>
+</body>
+</html>

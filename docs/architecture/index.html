@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture — SKComm Docs</title>
+    <meta name="description" content="Architecture documentation for SKComm">
+    <link rel="canonical" href="https://skcomm.io/docs/architecture/">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-deep: #0f172a; --bg-card: #1e293b; --bg-code: #0d1117;
+            --border: #334155; --text: #e2e8f0; --text-dim: #94a3b8;
+            --accent: #8b5cf6; --accent-glow: #a78bfa;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body { font-family: var(--font-body); background: var(--bg-deep); color: var(--text); line-height: 1.7; }
+        a { color: var(--accent-glow); text-decoration: none; }
+        a:hover { color: var(--text); }
+        .nav { position: sticky; top: 0; z-index: 100; background: rgba(15,23,42,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+        .nav-inner { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo { font-size: 1.4rem; font-weight: 800; color: var(--text); text-decoration: none; }
+        .nav-logo span { color: var(--accent); }
+        .nav-links { list-style: none; display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a { color: var(--text-dim); font-size: .9rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-glow); }
+        .layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 220px 1fr; gap: 3rem; padding: 2rem; }
+        .sidebar { position: sticky; top: 80px; align-self: start; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin-bottom: .5rem; }
+        .sidebar a { color: var(--text-dim); font-size: .9rem; display: block; padding: .4rem .8rem; border-radius: 6px; }
+        .sidebar a:hover, .sidebar a.active { color: var(--accent-glow); background: rgba(59,130,246,.1); }
+        .content { min-width: 0; }
+        .content h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 1.5rem; }
+        .content h2 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+        .content h3 { font-size: 1.2rem; font-weight: 600; margin: 1.5rem 0 .75rem; }
+        .content h4 { font-size: 1rem; font-weight: 600; margin: 1rem 0 .5rem; }
+        .content p { margin-bottom: 1rem; color: var(--text); }
+        .content ul, .content ol { margin: 0 0 1rem 1.5rem; }
+        .content li { margin-bottom: .4rem; }
+        .content pre { background: var(--bg-code); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+        .content code { font-family: var(--font-mono); font-size: .85rem; }
+        .content p code, .content li code { background: var(--bg-code); padding: .15rem .4rem; border-radius: 4px; font-size: .85rem; }
+        .content hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+        .content strong { color: var(--text); font-weight: 600; }
+        .table-wrap { overflow-x: auto; margin: 1rem 0; }
+        .content table { border-collapse: collapse; width: 100%; }
+        .content td { padding: .5rem .75rem; border: 1px solid var(--border); font-size: .9rem; }
+        .content tr:nth-child(odd) { background: rgba(30,41,59,.5); }
+        .footer { text-align: center; padding: 3rem 2rem; color: var(--text-dim); font-size: .85rem; border-top: 1px solid var(--border); margin-top: 4rem; }
+        @media (max-width: 768px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">SK<span>Comm</span></a>
+    <ul class="nav-links">
+      <li><a href="/docs/">Docs</a></li>
+      <li><a href="https://github.com/smilinTux/skcomm">GitHub →</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="layout">
+    <aside class="sidebar">
+        <ul>
+            <li><a href="/docs/architecture/" class="active">Architecture</a></li><li><a href="/docs/key-exchange/" >Key Exchange SOP</a></li><li><a href="/docs/webrtc/" >WebRTC Video</a></li>
+        </ul>
+    </aside>
+    <main class="content">
+        <h1>SKComm Architecture</h1>
+<p>Visual architecture reference for SKComm. For the detailed prose architecture</p>
+<p>document see <a href="../ARCHITECTURE.md">ARCHITECTURE.md</a> at the repo root.</p>
+<hr>
+<h2>Transport Architecture</h2>
+<pre><code class="language-mermaid">
+graph TB
+    subgraph "SKComm Core"
+        Core[SKComm Core] --&gt; Router[Message Router]
+        Router --&gt; |failover/broadcast| T1[Syncthing Transport]
+        Router --&gt; |failover/broadcast| T2[File Transport]
+        Router --&gt; |failover/broadcast| T3[Nostr Transport]
+        Router --&gt; |failover/broadcast| T4[WebSocket Transport]
+    end
+
+    subgraph "Security Layer"
+        Crypto[EnvelopeCrypto] --&gt; |PGP encrypt| Core
+        Signing[EnvelopeSigner] --&gt; |PGP sign| Core
+        KeyStore[KeyStore] --&gt; Crypto
+    end
+
+    subgraph "Peer Management"
+        Discovery[PeerStore] --&gt; Router
+        KeyExchange[Key Exchange] --&gt; Discovery
+        KeyExchange --&gt; |DID fetch| DID[skworld.io DID Registry]
+        KeyExchange --&gt; |bundle import| Bundle[Peer Bundle JSON]
+    end
+
+    subgraph "API Layer"
+        REST[FastAPI Server] --&gt; Core
+        DIDRouter[DID Router] --&gt; REST
+        ProfileRouter[Profile Router] --&gt; REST
+        MCP[MCP Server] --&gt; Core
+    end
+</code></pre>
+<hr>
+<h2>Message Flow</h2>
+<pre><code class="language-mermaid">
+sequenceDiagram
+    participant S as Sender
+    participant SC as SKComm Core
+    participant C as EnvelopeCrypto
+    participant R as Router
+    participant T as Transport
+    participant FS as Syncthing/File
+
+    S-&gt;&gt;SC: send(recipient, message)
+    SC-&gt;&gt;SC: Create MessageEnvelope
+    SC-&gt;&gt;C: encrypt_payload(envelope, peer_key)
+    C--&gt;&gt;SC: encrypted envelope
+    SC-&gt;&gt;C: sign_payload(envelope)
+    C--&gt;&gt;SC: signed envelope
+    SC-&gt;&gt;R: route(envelope)
+    R-&gt;&gt;T: send(envelope_bytes)
+    T-&gt;&gt;FS: Write to outbox/{recipient}/
+    FS--&gt;&gt;T: File synced
+</code></pre>
+<hr>
+<h2>Key Exchange Flow</h2>
+<pre><code class="language-mermaid">
+graph LR
+    subgraph "Public Exchange"
+        A1[Agent publishes DID] --&gt; A2[skworld.io Registry]
+        A2 --&gt; A3[skcomm peer fetch name]
+        A3 --&gt; A4[PeerInfo + public key saved]
+    end
+
+    subgraph "Private Exchange"
+        B1[skcomm peer export] --&gt; B2[bundle.json]
+        B2 --&gt; |file/USB/Signal| B3[skcomm peer import bundle.json]
+        B3 --&gt; B4[PeerInfo + GPG import]
+    end
+</code></pre>
+<p>See <a href="SOP-KEY-EXCHANGE.md">SOP-KEY-EXCHANGE.md</a> for the full step-by-step procedure.</p>
+<hr>
+<h2>DID Three-Tier Model</h2>
+<pre><code class="language-mermaid">
+graph TB
+    subgraph "Tier 3: Public Internet"
+        T3[did:web:ws.weblink.skworld.io:agents:slug]
+        T3 --&gt; |minimal| T3D[Name + JWK public key only]
+        T3 --&gt; |hosted on| CF[Cloudflare KV]
+    end
+
+    subgraph "Tier 2: Mesh Private"
+        T2[did:web:hostname.tailnet.ts.net]
+        T2 --&gt; |full| T2D[Service endpoints + capabilities + agent card]
+        T2 --&gt; |served via| TS[Tailscale Serve]
+    end
+
+    subgraph "Tier 1: Self-Contained"
+        T1[did:key:z6Mk...]
+        T1 --&gt; T1D[Zero infrastructure needed]
+    end
+
+    T1 -.-&gt;|fallback| T2
+    T2 -.-&gt;|public subset| T3
+</code></pre>
+<div class="table-wrap"><table>
+<tr><td>Tier</td><td>DID Format</td><td>Scope</td><td>Contents</td></tr>
+<tr><td>1</td><td>`did:key:z6Mk...`</td><td>Universal</td><td>Self-contained public key, zero infrastructure</td></tr>
+<tr><td>2</td><td>`did:web:{tailnet-hostname}`</td><td>Mesh-private</td><td>Full service endpoints, capabilities, agent card</td></tr>
+<tr><td>3</td><td>`did:web:ws.weblink.skworld.io:agents:{slug}`</td><td>Public internet</td><td>Minimal: name + JWK public key</td></tr>
+</table></div>
+<hr>
+<h2>DID API Endpoints</h2>
+<p>The <code>did_router</code> (mounted on the FastAPI server via <code>skcomm serve</code>) exposes the</p>
+<p>following routes:</p>
+<div class="table-wrap"><table>
+<tr><td>Method</td><td>Path</td><td>Auth</td><td>Description</td></tr>
+<tr><td>`GET`</td><td>`/.well-known/did.json`</td><td>None</td><td>Tier 2 mesh DID document; Tier 1 fallback</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/did/key`</td><td>None</td><td>`did:key` identifier + PGP fingerprint</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/did/verify`</td><td>None</td><td>Structural DID challenge-response validation</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/did/document`</td><td>CapAuth bearer</td><td>All three tiers in one response</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/did/peers/{name}`</td><td>CapAuth bearer</td><td>Peer DID from `~/.skcapstone/peers/{name}.json`</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/did/publish`</td><td>CapAuth bearer</td><td>Generate all DID tiers and write to disk</td></tr>
+</table></div>
+<hr>
+<h2>System Layers</h2>
+<pre><code class="language-">
+┌────────────────────────────────────────────────────────────────┐
+│                        Application Layer                        │
+│  CLI (skcomm send/receive/peer)  │  Python API  │  MCP Server  │
+├────────────────────────────────────────────────────────────────┤
+│                        Protocol Layer                           │
+│  Envelope creation  │  Serialization  │  Thread management      │
+├────────────────────────────────────────────────────────────────┤
+│                  Security Layer (CapAuth)                        │
+│  PGP encrypt/decrypt  │  Sign/verify  │  CapAuth identity/trust  │
+├────────────────────────────────────────────────────────────────┤
+│                  Peer Management Layer                          │
+│  PeerStore  │  Key Exchange (DID + bundle)  │  DID Router       │
+├────────────────────────────────────────────────────────────────┤
+│                        Routing Layer                            │
+│  Transport selection  │  Priority queue  │  Failover  │  Retry  │
+├────────────────────────────────────────────────────────────────┤
+│                        Transport Layer                          │
+│  WebRTC │ Tailscale │ WebSocket │ Syncthing │ File │ Nostr │ .. │
+├────────────────────────────────────────────────────────────────┤
+│                        Network / Physical                       │
+│  TCP/IP │ UDP │ Filesystem │ USB │ QR code │ DNS │ IPFS         │
+└────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h2>Source Layout</h2>
+<pre><code class="language-">
+src/skcomm/
+├── core.py             # SKComm entry point — send/receive orchestration
+├── router.py           # Transport selection, failover, broadcast logic
+├── crypto.py           # EnvelopeCrypto — PGP encrypt/decrypt
+├── signing.py          # EnvelopeSigner — PGP sign/verify
+├── key_exchange.py     # Peer key exchange: DID fetch + bundle export/import
+├── did_router.py       # FastAPI DID API endpoints (three-tier model)
+├── discovery.py        # PeerStore — YAML-backed peer registry
+├── models.py           # Shared data models (MessageEnvelope, PeerInfo, ...)
+├── config.py           # Config loading (~/.skcomm/config.yml)
+├── cli.py              # Click CLI — skcomm send/receive/peer/status/...
+├── api.py              # FastAPI app — skcomm serve
+├── mcp_server.py       # MCP server — skcomm-mcp
+├── profile_router.py   # FastAPI profile endpoints
+├── household_router.py # FastAPI household endpoints
+├── souls_router.py     # FastAPI souls endpoints
+├── pubsub.py           # Pub/sub broker
+├── signaling.py        # WebRTC signaling broker
+└── transports/         # Transport plugins
+    ├── file.py
+    ├── syncthing.py
+    ├── websocket.py
+    ├── nostr.py
+    ├── webrtc.py
+    ├── tailscale.py
+    └── ...
+</code></pre>
+    </main>
+</div>
+<footer class="footer">
+    <p>SKComm is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
+</footer>
+</body>
+</html>
