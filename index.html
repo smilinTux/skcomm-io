@@ -1,345 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKComm — Sovereign Multi-Channel Communication</title>
-    <meta name="description" content="17 communication paths. Zero lock-in. WebRTC, WebSocket, Tailscale, Nostr, Telegram, and more — all under your control.">
-    <link rel="canonical" href="https://skcomm.io/">
-    <meta property="og:title" content="SKComm — Sovereign Multi-Channel Communication">
-    <meta property="og:description" content="17 communication paths. Zero lock-in. Your agents talk on your terms.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://skcomm.io">
-    <meta property="og:site_name" content="smilinTux">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐧</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Sans+3:wght@400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-      :root {
-        --primary: #0E2B3D;
-        --accent:  #00C8D4;
-        --yellow:  #FFD166;
-        --white:   #F7FBFF;
-        --black:   #0B0B0B;
-        --gray:    #A9B2BB;
-        --card-bg: rgba(255,255,255,0.05);
-        --card-border: rgba(255,255,255,0.10);
-        --radius: 12px;
-      }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>skcomm → skcomms.skworld.io</title>
 
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-      body {
-        font-family: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
-        background: var(--primary);
-        color: var(--white);
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-      }
-      h1, h2, h3, h4 { font-family: 'Inter', sans-serif; font-weight: 700; }
-      code, pre { font-family: 'Fira Code', monospace; }
-      a { color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
-      a:hover { opacity: 0.8; }
+  <!-- Instant redirect -->
+  <meta http-equiv="refresh" content="0; url=https://skcomms.skworld.io/">
+  <link rel="canonical" href="https://skcomms.skworld.io/">
 
-      nav {
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-        background: rgba(14,43,61,0.95);
-        backdrop-filter: blur(12px);
-        position: sticky;
-        top: 0;
-        z-index: 50;
-      }
-      .nav-inner {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 4rem;
-        padding: 0 2rem;
-      }
-      .nav-logo { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--white); text-decoration: none; }
-      .nav-logo .accent { color: var(--accent); }
-      .nav-links { display: flex; align-items: center; gap: 2rem; }
-      .nav-link { font-size: 0.9rem; color: var(--gray); text-decoration: none; transition: color 0.15s; }
-      .nav-link:hover { color: var(--white); opacity: 1; }
+  <!-- SEO: tell crawlers this moved permanently -->
+  <meta name="robots" content="noindex, follow">
 
-      .hero { text-align: center; padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; }
-      .hero-icon { font-size: 3.5rem; margin-bottom: 1.5rem; }
-      .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; letter-spacing: -0.025em; margin-bottom: 1.5rem; }
-      .hero h1 .accent { color: var(--accent); }
-      .hero h1 .yellow { color: var(--yellow); }
-      .hero .tagline { font-size: 1.25rem; color: var(--gray); max-width: 42rem; margin: 0 auto 0.75rem; }
-      .hero .motto { color: var(--accent); font-family: 'Fira Code', monospace; font-size: 0.85rem; margin-bottom: 2.5rem; }
-      .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap');
 
-      .btn-primary {
-        display: inline-flex; align-items: center; gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background: linear-gradient(90deg, var(--accent), #0090a0);
-        color: var(--white); font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600;
-        border-radius: var(--radius); text-decoration: none;
-        transition: transform 0.15s, opacity 0.15s; border: none; cursor: pointer;
-        box-shadow: 0 4px 20px rgba(0,200,212,0.25);
-      }
-      .btn-primary:hover { transform: translateY(-2px); opacity: 1; }
-      .btn-outline {
-        display: inline-flex; align-items: center; gap: 0.5rem;
-        padding: 0.75rem 1.5rem; background: transparent; color: var(--white);
-        font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600;
-        border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.2);
-        text-decoration: none; transition: border-color 0.15s, transform 0.15s;
-      }
-      .btn-outline:hover { border-color: var(--accent); color: var(--white); transform: translateY(-2px); opacity: 1; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-      .stat-bar { display: flex; justify-content: center; gap: 3rem; padding: 2rem 2rem 3rem; flex-wrap: wrap; }
-      .stat-item { text-align: center; }
-      .stat-item .num { font-family: 'Inter', sans-serif; font-size: 2.5rem; font-weight: 800; color: var(--accent); display: block; }
-      .stat-item .label { font-size: 0.875rem; color: var(--gray); }
-
-      .channels-section { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
-      .channels-section h2 { text-align: center; font-size: 2rem; margin-bottom: 2.5rem; }
-      .channels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-      .channel-card {
-        border: 1px solid var(--card-border); background: var(--card-bg);
-        border-radius: var(--radius); padding: 1.25rem 1.5rem;
-        transition: transform 0.2s, border-color 0.2s;
-        display: flex; align-items: center; gap: 0.75rem;
-        text-decoration: none; color: inherit;
-      }
-      .channel-card:hover { transform: translateY(-3px); border-color: var(--accent); opacity: 1; }
-      .channel-icon { font-size: 1.5rem; flex-shrink: 0; }
-      .channel-card h3 { font-size: 0.95rem; color: var(--white); margin-bottom: 0.1rem; }
-      .channel-card p { font-size: 0.78rem; color: var(--gray); }
-
-      .why-section { max-width: 900px; margin: 0 auto; padding: 2rem 2rem 4rem; }
-      .why-section h2 { font-size: 2rem; text-align: center; margin-bottom: 2rem; }
-      .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
-      .why-card {
-        border: 1px solid var(--card-border); background: var(--card-bg);
-        border-radius: var(--radius); padding: 1.5rem;
-        transition: transform 0.2s, border-color 0.2s;
-        text-decoration: none; color: inherit; display: block;
-      }
-      .why-card:hover { transform: translateY(-4px); border-color: var(--yellow); opacity: 1; }
-      .why-card .icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
-      .why-card h3 { font-size: 1rem; color: var(--yellow); margin-bottom: 0.5rem; }
-      .why-card p { font-size: 0.875rem; color: var(--gray); }
-
-      .install-section { max-width: 44rem; margin: 0 auto; padding: 2rem 2rem 4rem; text-align: center; }
-      .install-section h2 { font-size: 1.75rem; margin-bottom: 1.5rem; }
-      .code-block {
-        background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-        border-radius: var(--radius); padding: 1rem 1.25rem;
-        font-family: 'Fira Code', monospace; font-size: 0.95rem; color: var(--accent);
-        text-align: left; display: flex; align-items: center; gap: 0.5rem;
-        position: relative; margin-bottom: 1rem;
-      }
-      .code-prompt { color: var(--gray); user-select: none; }
-      .copy-btn {
-        position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
-        background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
-        color: var(--gray); padding: 0.25rem 0.75rem; border-radius: 8px;
-        font-size: 0.78rem; cursor: pointer; transition: color 0.15s, border-color 0.15s;
-        font-family: 'Inter', sans-serif;
-      }
-      .copy-btn:hover { color: var(--white); border-color: var(--accent); }
-
-      footer {
-        border-top: 1px solid rgba(255,255,255,0.08);
-        padding: 3rem 2rem; text-align: center; color: var(--gray); font-size: 0.85rem; margin-top: 2rem;
-      }
-      footer .holding { color: var(--yellow); font-weight: 600; }
-      footer a { color: var(--accent); }
-
-      @media (max-width: 768px) {
-        .hero h1 { font-size: 2.2rem; }
-        .stat-bar { gap: 1.5rem; }
-        .cta-row { flex-direction: column; padding: 0 1rem; }
-        .cta-row a { justify-content: center; }
-      }
-    </style>
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://smilintux.github.io/#organization",
-      "name": "smilinTux",
-      "url": "https://smilintux.github.io",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://skcomm.io/favicon.ico",
-        "width": 512,
-        "height": 512
-      },
-      "sameAs": [
-        "https://github.com/smilinTux"
-      ],
-      "description": "Sovereign AI infrastructure — building open, authentic, human-first technology. Home of the Pengu Empire.",
-      "foundingDate": "2024",
-      "knowsAbout": [
-        "Sovereign AI",
-        "AI agent infrastructure",
-        "Open source security",
-        "Persistent AI memory",
-        "Decentralized identity"
-      ]
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://skcomm.io/#website",
-      "name": "SKComm",
-      "url": "https://skcomm.io",
-      "publisher": {
-        "@id": "https://smilintux.github.io/#organization"
-      },
-      "inLanguage": "en-US"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": "https://skcomm.io/#app",
-      "name": "SKComm",
-      "description": "17 communication paths. Zero lock-in. WebRTC, WebSocket, Tailscale, Nostr, Telegram, and more — all under your control.",
-      "url": "https://skcomm.io",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Linux, macOS",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "license": "https://www.gnu.org/licenses/gpl-3.0.en.html",
-      "isPartOf": {
-        "@type": "SoftwareApplication",
-        "name": "SKWorld",
-        "url": "https://skworld.io"
-      },
-      "publisher": {
-        "@id": "https://smilintux.github.io/#organization"
-      }
+    :root {
+      --gold: #FFD700;
+      --cyan: #00FFFF;
+      --pink: #FF69B4;
+      --green: #50fa7b;
+      --bg: #0a0a0f;
+      --dim: rgba(255,255,255,0.55);
+      --mono: 'JetBrains Mono', 'Fira Code', monospace;
     }
-  ]
-}
-    </script>
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: rgba(255,255,255,0.88);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+      overflow: hidden;
+    }
+
+    /* Starfield */
+    .starfield {
+      position: fixed; inset: 0; z-index: -1;
+      background: radial-gradient(ellipse at 50% -10%, #1a1a3e 0%, #0d0d1f 40%, #0a0a0f 100%);
+    }
+    .stars {
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255,215,0,0.9), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(0,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255,105,180,0.8), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 70px 55px, rgba(189,147,249,0.7), transparent);
+      background-repeat: repeat;
+      background-size: 200px 100px;
+      animation: starscroll 100s linear infinite;
+    }
+    .stars:nth-child(2) { background-size: 270px 130px; animation-duration: 145s; animation-direction: reverse; opacity: .7; }
+    .stars:nth-child(3) { background-size: 340px 165px; animation-duration: 190s; opacity: .45; }
+    @keyframes starscroll {
+      from { transform: translateX(0) translateY(0); }
+      to   { transform: translateX(-200px) translateY(-100px); }
+    }
+
+    .penguin {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      animation: float 3s ease-in-out infinite;
+      display: block;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .moved-label {
+      font-family: var(--mono); font-size: .8rem;
+      color: var(--cyan); letter-spacing: .18em;
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 800; margin-bottom: .75rem; line-height: 1.1;
+    }
+
+    .arrow-line {
+      display: flex; align-items: center; justify-content: center;
+      gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+    .from-name {
+      font-family: var(--mono); font-size: 1.1rem;
+      color: var(--dim); text-decoration: line-through;
+    }
+    .arrow { font-size: 1.5rem; color: var(--gold); }
+    .to-name {
+      font-family: var(--mono); font-size: 1.1rem;
+      background: linear-gradient(135deg, var(--gold), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; font-weight: 700;
+    }
+
+    p {
+      color: var(--dim); max-width: 480px;
+      line-height: 1.65; margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--pink) 60%);
+      color: #000; font-weight: 700; font-size: 1rem;
+      padding: .85rem 2rem; border-radius: 10px;
+      text-decoration: none; transition: all .25s;
+      box-shadow: 0 4px 20px rgba(255,215,0,.35);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,215,0,.5); }
+
+    .note {
+      margin-top: 2rem;
+      font-family: var(--mono); font-size: .8rem;
+      color: rgba(255,255,255,.3);
+    }
+  </style>
 </head>
 <body>
 
-  <nav>
-    <div class="nav-inner">
-      <a href="https://skcomm.io" class="nav-logo">🐧 SK<span class="accent">Comm</span></a>
-      <div class="nav-links">
-        <a href="https://smilinTux.org" class="nav-link">smilinTux</a>
-        <a href="https://skworld.io" class="nav-link">SKWorld</a>
-        <a href="https://skcapstone.io" class="nav-link">SKCapstone</a>
-        <a href="https://github.com/smilinTux/skcomm" class="nav-link" target="_blank" rel="noopener">GitHub</a>
-      </div>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <div class="hero-icon">📡</div>
-    <h1>SK<span class="accent">Comm</span></h1>
-    <p class="tagline">Sovereign multi-channel communication. <span class="yellow">17 paths</span>. Zero lock-in.</p>
-    <p style="font-size:0.9rem; color:var(--accent); margin-bottom:0.5rem;">Your messages never touch a server you don't own. Your keys never leave. No platform can revoke your voice.</p>
-    <p class="motto">#yourAgents #yourChannels #yourRules</p>
-    <div class="cta-row">
-      <a href="#install" class="btn-primary">Get Started</a>
-      <a href="https://github.com/smilinTux/skcomm" class="btn-outline" target="_blank" rel="noopener">View on GitHub</a>
-    </div>
-  </section>
-
-  <div class="stat-bar">
-    <div class="stat-item">
-      <span class="num">17</span>
-      <span class="label">Communication Paths</span>
-    </div>
-    <div class="stat-item">
-      <span class="num">0</span>
-      <span class="label">Vendor Dependencies</span>
-    </div>
-    <div class="stat-item">
-      <span class="num">∞</span>
-      <span class="label">Sovereign Control</span>
-    </div>
+  <div class="starfield" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="stars"></div>
+    <div class="stars"></div>
   </div>
 
-  <section class="channels-section" id="channels">
-    <h2>📡 Communication Channels</h2>
-    <div class="channels-grid">
-      <a href="https://github.com/smilinTux/skcomm#webrtc" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">🔗</span><div><h3>WebRTC</h3><p>Peer-to-peer, no relay</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#websocket" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">⚡</span><div><h3>WebSocket</h3><p>Real-time duplex streams</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#tailscale" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">🌐</span><div><h3>Tailscale</h3><p>Encrypted mesh overlay</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#nostr" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">📻</span><div><h3>Nostr</h3><p>Decentralized relay protocol</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#telegram" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">✈️</span><div><h3>Telegram</h3><p>Bot API integration</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#tor" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">🔒</span><div><h3>Tor Hidden Services</h3><p>Anonymized onion routing</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#smtp" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">📬</span><div><h3>SMTP / Email</h3><p>Async agent mail drops</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#filedrop" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">🗂️</span><div><h3>File Drop</h3><p>Shared filesystem messaging</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#pgp" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">🔑</span><div><h3>PGP Signed Msgs</h3><p>Cryptographic delivery receipts</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#mcp" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">🧩</span><div><h3>MCP Channels</h3><p>Model Context Protocol native</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm#push" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">📱</span><div><h3>Push Notifications</h3><p>Self-hosted Ntfy support</p></div></a>
-      <a href="https://github.com/smilinTux/skcomm" class="channel-card" target="_blank" rel="noopener"><span class="channel-icon">🔧</span><div><h3>+ 6 More Paths</h3><p>HTTP, gRPC, MQTT, and more</p></div></a>
-    </div>
-  </section>
+  <span class="penguin" aria-hidden="true">🐧</span>
 
-  <section class="why-section">
-    <h2>🏠 Why Sovereign Comms?</h2>
-    <div class="why-grid">
-      <a href="https://github.com/smilinTux/skcomm#why-sovereign" class="why-card" target="_blank" rel="noopener">
-        <div class="icon">🚫</div>
-        <h3>No Platform Risk</h3>
-        <p>Telegram bans agents. Slack rate-limits you. Discord changes ToS. Own your channels.</p>
-      </a>
-      <a href="https://sksecurity.io" class="why-card" target="_blank" rel="noopener">
-        <div class="icon">🔐</div>
-        <h3>End-to-End Control</h3>
-        <p>Every message path is auditable. PGP signing means receipts are cryptographic facts.</p>
-      </a>
-      <a href="https://skcapstone.io" class="why-card" target="_blank" rel="noopener">
-        <div class="icon">🐧</div>
-        <h3>Agent-Native</h3>
-        <p>Built for the SKCapstone ecosystem. Your AI agents route messages the way you configure — not how BigTech wants.</p>
-      </a>
-    </div>
-  </section>
+  <div class="moved-label">We moved</div>
 
-  <!-- Own the Full Vertical -->
-  <section style="max-width:900px; margin:0 auto; padding:2rem 2rem 3rem; border-top:1px solid rgba(255,255,255,0.08);">
-    <h2 style="font-size:1.6rem; margin-bottom:1rem;">🏛️ Own the Full Vertical</h2>
-    <p style="color:var(--gray); font-size:1rem; max-width:680px; margin-bottom:1rem;">The modern comms stack is rented — Slack owns your channels, Telegram owns your keys, Discord owns your history. <strong style="color:var(--white);">SKComm is your comms layer</strong>: 17 paths, every message on your hardware, zero lock-in you can't walk away from. Sovereignty isn't a feature — it's the foundation.</p>
-    <p style="color:var(--gray); font-size:0.9rem; margin-bottom:1.25rem;">SKComm sits in the <strong style="color:var(--accent);">Comms</strong> layer of the SKWorld vertical — silicon → OS → security → identity → data → models → <strong style="color:var(--accent);">comms</strong> → apps → soul. Every layer open. Every layer yours.</p>
-    <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
-      <span style="color:var(--gray); font-size:0.85rem;">Layers you own:</span>
-      <a href="https://skstacks.io" style="font-size:0.85rem; color:var(--accent); border:1px solid rgba(0,200,212,0.3); padding:0.2rem 0.7rem; border-radius:20px;">⚙️ Infra — SKStacks</a>
-      <a href="https://skmemory.io" style="font-size:0.85rem; color:var(--accent); border:1px solid rgba(0,200,212,0.3); padding:0.2rem 0.7rem; border-radius:20px;">🧠 Data — SKMemory</a>
-      <a href="https://skchat.io" style="font-size:0.85rem; color:var(--accent); border:1px solid rgba(0,200,212,0.3); padding:0.2rem 0.7rem; border-radius:20px;">💬 Chat — SKChat</a>
-      <a href="https://skworld.io" style="font-size:0.85rem; color:var(--yellow); border:1px solid rgba(255,209,102,0.3); padding:0.2rem 0.7rem; border-radius:20px; font-weight:600;">🐧 See the whole vertical →</a>
-    </div>
-  </section>
+  <h1>skcomm has a new home.</h1>
 
-  <section class="install-section" id="install">
-    <h2>🚀 Get Started</h2>
-    <div class="code-block">
-      <span class="code-prompt">$</span> pip install skcomm
-      <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install skcomm');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
-    </div>
-    <div class="code-block">
-      <span class="code-prompt">$</span> skcomm init --channels webrtc,tailscale,nostr
-      <button class="copy-btn" onclick="navigator.clipboard.writeText('skcomm init --channels webrtc,tailscale,nostr');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button>
-    </div>
-    <p style="color:var(--gray); font-size:0.95rem; margin-top:1.5rem;">
-      Part of the <a href="https://skcapstone.io">SKCapstone framework →</a>
-    </p>
-  </section>
+  <div class="arrow-line" aria-label="Redirecting from skcomm.io to skcomms.skworld.io">
+    <span class="from-name">skcomm.io</span>
+    <span class="arrow" aria-hidden="true">→</span>
+    <span class="to-name">skcomms.skworld.io</span>
+  </div>
 
-  <footer>
-    <p>🐧 Part of the <a href="https://smilinTux.org">smilinTux</a> sovereign ecosystem</p>
-    <p class="holding" style="margin-top:0.5rem;">smilinTux — Cool Heads. Warm Justice. Smart Systems.</p>
-    <p style="margin-top:0.25rem; color: #5a6a77;">staycuriousANDkeepsmilin | AGPL-3.0</p>
-  </footer>
+  <p>
+    skcomm is now <strong style="color:rgba(255,255,255,.8)">skcomms</strong> — the sovereign
+    communications layer of the SKWorld ecosystem. Same project, same mission,
+    canonical name on the <strong style="color:rgba(255,255,255,.8)">skworld.io</strong> subdomain family.
+  </p>
+
+  <a href="https://skcomms.skworld.io/" class="btn">
+    Go to skcomms.skworld.io ↗
+  </a>
+
+  <p class="note">You should be redirected automatically. If not, click the button above.</p>
+
+  <script>
+    // JS fallback redirect
+    if (typeof window !== 'undefined') {
+      window.location.replace('https://skcomms.skworld.io/');
+    }
+  </script>
 
 </body>
 </html>
