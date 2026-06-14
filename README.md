@@ -1,2 +1,2 @@
-# skcomm-io
-📡 SKComm - Secure communications and messaging infrastructure
+# skcomms-io
+📡 SKComms - Secure communications and messaging infrastructure

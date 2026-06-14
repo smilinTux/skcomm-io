@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architecture — SKComm Docs</title>
-    <meta name="description" content="Architecture documentation for SKComm">
+    <title>Architecture — SKComms Docs</title>
+    <meta name="description" content="Architecture documentation for SKComms">
     <link rel="canonical" href="https://skcomm.io/docs/architecture/">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -75,15 +75,15 @@
         </ul>
     </aside>
     <main class="content">
-        <h1>SKComm Architecture</h1>
-<p>Visual architecture reference for SKComm. For the detailed prose architecture</p>
+        <h1>SKComms Architecture</h1>
+<p>Visual architecture reference for SKComms. For the detailed prose architecture</p>
 <p>document see <a href="../ARCHITECTURE.md">ARCHITECTURE.md</a> at the repo root.</p>
 <hr>
 <h2>Transport Architecture</h2>
 <pre><code class="language-mermaid">
 graph TB
-    subgraph "SKComm Core"
-        Core[SKComm Core] --&gt; Router[Message Router]
+    subgraph "SKComms Core"
+        Core[SKComms Core] --&gt; Router[Message Router]
         Router --&gt; |failover/broadcast| T1[Syncthing Transport]
         Router --&gt; |failover/broadcast| T2[File Transport]
         Router --&gt; |failover/broadcast| T3[Nostr Transport]
@@ -115,7 +115,7 @@ graph TB
 <pre><code class="language-mermaid">
 sequenceDiagram
     participant S as Sender
-    participant SC as SKComm Core
+    participant SC as SKComms Core
     participant C as EnvelopeCrypto
     participant R as Router
     participant T as Transport
@@ -138,13 +138,13 @@ sequenceDiagram
 graph LR
     subgraph "Public Exchange"
         A1[Agent publishes DID] --&gt; A2[skworld.io Registry]
-        A2 --&gt; A3[skcomm peer fetch name]
+        A2 --&gt; A3[skcomms peer fetch name]
         A3 --&gt; A4[PeerInfo + public key saved]
     end
 
     subgraph "Private Exchange"
-        B1[skcomm peer export] --&gt; B2[bundle.json]
-        B2 --&gt; |file/USB/Signal| B3[skcomm peer import bundle.json]
+        B1[skcomms peer export] --&gt; B2[bundle.json]
+        B2 --&gt; |file/USB/Signal| B3[skcomms peer import bundle.json]
         B3 --&gt; B4[PeerInfo + GPG import]
     end
 </code></pre>
@@ -181,7 +181,7 @@ graph TB
 </table></div>
 <hr>
 <h2>DID API Endpoints</h2>
-<p>The <code>did_router</code> (mounted on the FastAPI server via <code>skcomm serve</code>) exposes the</p>
+<p>The <code>did_router</code> (mounted on the FastAPI server via <code>skcomms serve</code>) exposes the</p>
 <p>following routes:</p>
 <div class="table-wrap"><table>
 <tr><td>Method</td><td>Path</td><td>Auth</td><td>Description</td></tr>
@@ -197,7 +197,7 @@ graph TB
 <pre><code class="language-">
 ┌────────────────────────────────────────────────────────────────┐
 │                        Application Layer                        │
-│  CLI (skcomm send/receive/peer)  │  Python API  │  MCP Server  │
+│  CLI (skcomms send/receive/peer)  │  Python API  │  MCP Server  │
 ├────────────────────────────────────────────────────────────────┤
 │                        Protocol Layer                           │
 │  Envelope creation  │  Serialization  │  Thread management      │
@@ -221,8 +221,8 @@ graph TB
 <hr>
 <h2>Source Layout</h2>
 <pre><code class="language-">
-src/skcomm/
-├── core.py             # SKComm entry point — send/receive orchestration
+src/skcomms/
+├── core.py             # SKComms entry point — send/receive orchestration
 ├── router.py           # Transport selection, failover, broadcast logic
 ├── crypto.py           # EnvelopeCrypto — PGP encrypt/decrypt
 ├── signing.py          # EnvelopeSigner — PGP sign/verify
@@ -230,10 +230,10 @@ src/skcomm/
 ├── did_router.py       # FastAPI DID API endpoints (three-tier model)
 ├── discovery.py        # PeerStore — YAML-backed peer registry
 ├── models.py           # Shared data models (MessageEnvelope, PeerInfo, ...)
-├── config.py           # Config loading (~/.skcomm/config.yml)
-├── cli.py              # Click CLI — skcomm send/receive/peer/status/...
-├── api.py              # FastAPI app — skcomm serve
-├── mcp_server.py       # MCP server — skcomm-mcp
+├── config.py           # Config loading (~/.skcomms/config.yml)
+├── cli.py              # Click CLI — skcomms send/receive/peer/status/...
+├── api.py              # FastAPI app — skcomms serve
+├── mcp_server.py       # MCP server — skcomms-mcp
 ├── profile_router.py   # FastAPI profile endpoints
 ├── household_router.py # FastAPI household endpoints
 ├── souls_router.py     # FastAPI souls endpoints
@@ -251,7 +251,7 @@ src/skcomm/
     </main>
 </div>
 <footer class="footer">
-    <p>SKComm is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
+    <p>SKComms is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
 </footer>
 </body>
 </html>

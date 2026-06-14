@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebRTC Video — SKComm Docs</title>
-    <meta name="description" content="WebRTC Video documentation for SKComm">
+    <title>WebRTC Video — SKComms Docs</title>
+    <meta name="description" content="WebRTC Video documentation for SKComms">
     <link rel="canonical" href="https://skcomm.io/docs/webrtc/">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -83,7 +83,7 @@
 <p>This document describes the architecture for streaming MuseTalk-generated avatar</p>
 <p>video frames from the GPU server (192.168.0.100) to the browser over WebRTC,</p>
 <p>combined with TTS audio in a single <code>RTCPeerConnection</code>. The design extends the</p>
-<p>existing SKComm WebRTC transport (currently data-channel-only) to support media</p>
+<p>existing SKComms WebRTC transport (currently data-channel-only) to support media</p>
 <p>tracks while preserving CapAuth-signed SDP offers, TURN relay via</p>
 <p>turn.skworld.io, and the sovereign signaling broker.</p>
 <h2>Architecture Diagram</h2>
@@ -93,7 +93,7 @@ Browser (WebRTC consumer)
     |  RTCPeerConnection
     |    - VideoTrack (H.264 or VP8 from MuseTalk frames)
     |    - AudioTrack (Opus-encoded TTS audio)
-    |    - DataChannel "skcomm" (control messages, captions, emotion metadata)
+    |    - DataChannel "skcomms" (control messages, captions, emotion metadata)
     |
     |  ICE: STUN → direct LAN / TURN relay (turn.skworld.io)
     |  SDP: CapAuth PGP-signed, via /webrtc/ws signaling broker
@@ -111,7 +111,7 @@ GPU Server (192.168.0.100) — aiortc RTCPeerConnection
     |    - Chunks into 20ms Opus frames (960 samples @ 48kHz)
     |    - Yields av.AudioFrame with monotonic timestamps
     |
-    └─ DataChannel "skcomm" (existing)
+    └─ DataChannel "skcomms" (existing)
          - Transcript text, emotion state, control signals
 </code></pre>
 <h2>1. Creating a Video MediaStreamTrack from MuseTalk Frames</h2>
@@ -221,7 +221,7 @@ audio_track = TTSAudioTrack(audio_queue, sample_rate=48000)
 pc.addTrack(audio_track)
 
 # Create data channel for text/control (existing pattern)
-channel = pc.createDataChannel("skcomm", ordered=True)
+channel = pc.createDataChannel("skcomms", ordered=True)
 </code></pre>
 <h3>Audio Track Details</h3>
 <p>aiortc audio uses Opus codec (mandatory in WebRTC). The audio track must</p>
@@ -266,7 +266,7 @@ async def on_tts_chunk(audio_pcm: bytes, start_pts: int):
 <p>in addition to the data channel.</p>
 <pre><code class="language-javascript">
 // Connect to signaling broker (existing pattern)
-const ws = new WebSocket("wss://skchat.skworld.io/webrtc/ws?room=skcomm-CCBE..&peer=BROWSER_FP");
+const ws = new WebSocket("wss://skchat.skworld.io/webrtc/ws?room=skcomms-CCBE..&peer=BROWSER_FP");
 
 // Create peer connection with TURN
 const pc = new RTCPeerConnection({
@@ -449,9 +449,9 @@ async function connectFaceTime(agentName) {
     }
 }
 </code></pre>
-<h2>9. Integration Points with Existing SKComm / skchat</h2>
-<h3>SKComm WebRTC Transport Extension</h3>
-<p>The existing <code>WebRTCTransport</code> in <code>skcomm/transports/webrtc.py</code> only creates</p>
+<h2>9. Integration Points with Existing SKComms / skchat</h2>
+<h3>SKComms WebRTC Transport Extension</h3>
+<p>The existing <code>WebRTCTransport</code> in <code>skcomms/transports/webrtc.py</code> only creates</p>
 <p>data channels. The video/audio tracks are a separate concern — they belong</p>
 <p>in a new <code>FaceTimeSession</code> class that uses the same signaling infrastructure</p>
 <p>but creates its own <code>RTCPeerConnection</code> with media tracks.</p>
@@ -467,9 +467,9 @@ async function connectFaceTime(agentName) {
 <h3>New Files (Proposed)</h3>
 <div class="table-wrap"><table>
 <tr><td>File</td><td>Purpose</td></tr>
-<tr><td>`skcomm/transports/webrtc_media.py`</td><td>`FaceTimeSession` — media track management</td></tr>
-<tr><td>`skcomm/transports/video_track.py`</td><td>`MuseTalkVideoTrack` — aiortc VideoStreamTrack</td></tr>
-<tr><td>`skcomm/transports/audio_track.py`</td><td>`TTSAudioTrack` — aiortc AudioStreamTrack</td></tr>
+<tr><td>`skcomms/transports/webrtc_media.py`</td><td>`FaceTimeSession` — media track management</td></tr>
+<tr><td>`skcomms/transports/video_track.py`</td><td>`MuseTalkVideoTrack` — aiortc VideoStreamTrack</td></tr>
+<tr><td>`skcomms/transports/audio_track.py`</td><td>`TTSAudioTrack` — aiortc AudioStreamTrack</td></tr>
 <tr><td>`skchat/facetime.py`</td><td>`FaceTimeManager` — session lifecycle, MuseTalk coordination</td></tr>
 <tr><td>`skchat/static/facetime.html`</td><td>Browser UI</td></tr>
 <tr><td>`skchat/static/facetime.js`</td><td>WebRTC client logic</td></tr>
@@ -494,7 +494,7 @@ Browser ↔ skchat (WS proxy) ↔ SKVoice GPU (WebRTC origination)
 <p><strong>Option A: WebRTC from GPU box (recommended)</strong></p>
 <ul>
 <li>Browser connects directly to GPU box for WebRTC (STUN/ICE handles NAT).</li>
-<li>Signaling goes through skchat/skcomm broker (lightweight).</li>
+<li>Signaling goes through skchat/skcomms broker (lightweight).</li>
 <li>GPU box has the video frames and audio — no extra hop.</li>
 <li>TURN relay handles cases where direct connection fails.</li>
 </ul>
@@ -600,7 +600,7 @@ async def stop_facetime():
     </main>
 </div>
 <footer class="footer">
-    <p>SKComm is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
+    <p>SKComms is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
 </footer>
 </body>
 </html>

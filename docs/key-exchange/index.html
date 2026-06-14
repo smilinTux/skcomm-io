@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key Exchange SOP — SKComm Docs</title>
-    <meta name="description" content="Key Exchange SOP documentation for SKComm">
+    <title>Key Exchange SOP — SKComms Docs</title>
+    <meta name="description" content="Key Exchange SOP documentation for SKComms">
     <link rel="canonical" href="https://skcomm.io/docs/key-exchange/">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -75,8 +75,8 @@
         </ul>
     </aside>
     <main class="content">
-        <h1>SOP: SKComm Key Exchange</h1>
-<p>Standard Operating Procedure for adding new peers to the SKComm encrypted</p>
+        <h1>SOP: SKComms Key Exchange</h1>
+<p>Standard Operating Procedure for adding new peers to the SKComms encrypted</p>
 <p>messaging network. Two methods are supported: <strong>Public</strong> (DID-based) and</p>
 <p><strong>Private</strong> (direct bundle exchange).</p>
 <hr>
@@ -91,32 +91,32 @@
 <h3>Steps</h3>
 <pre><code class="language-bash">
 # 1. Fetch peer identity from DID registry
-skcomm peer fetch lumina
+skcomms peer fetch lumina
 
 # 2. Verify the output shows correct name + fingerprint
 #    Cross-check fingerprint out-of-band (chat, email, in-person)
 
 # 3. Peer is now in your store — verify
-skcomm peers
+skcomms peers
 
 # 4. Send a test message
-skcomm send lumina "Key exchange complete — can you read this?"
+skcomms send lumina "Key exchange complete — can you read this?"
 </code></pre>
 <h3>Custom DID URL</h3>
 <p>For peers hosting their DID document elsewhere:</p>
 <pre><code class="language-bash">
-skcomm peer fetch opus --url https://example.com/.well-known/did.json
+skcomms peer fetch opus --url https://example.com/.well-known/did.json
 </code></pre>
 <h3>Local File (Testing)</h3>
 <pre><code class="language-bash">
-skcomm peer fetch jarvis --url file:///path/to/did.json
+skcomms peer fetch jarvis --url file:///path/to/did.json
 </code></pre>
 <h3>What Gets Saved</h3>
 <div class="table-wrap"><table>
 <tr><td>File</td><td>Contents</td></tr>
-<tr><td>`~/.skcomm/peers/<name>.yml`</td><td>PeerInfo (name, fingerprint, transports)</td></tr>
-<tr><td>`~/.skcomm/peers/<name>.pub.asc`</td><td>PGP public key (if available alongside DID)</td></tr>
-<tr><td>`~/.skcomm/peers/<name>.did.json`</td><td>DID metadata (did:key, JWK, fetch timestamp)</td></tr>
+<tr><td>`~/.skcomms/peers/<name>.yml`</td><td>PeerInfo (name, fingerprint, transports)</td></tr>
+<tr><td>`~/.skcomms/peers/<name>.pub.asc`</td><td>PGP public key (if available alongside DID)</td></tr>
+<tr><td>`~/.skcomms/peers/<name>.did.json`</td><td>DID metadata (did:key, JWK, fetch timestamp)</td></tr>
 </table></div>
 <hr>
 <h2>Method 2: Private Key Exchange (Direct Bundle)</h2>
@@ -125,21 +125,21 @@ skcomm peer fetch jarvis --url file:///path/to/did.json
 <h3>Exporting Your Identity</h3>
 <pre><code class="language-bash">
 # Print bundle to terminal (copy-paste, pipe, redirect)
-skcomm peer export
+skcomms peer export
 
 # Save to file
-skcomm peer export --file my-identity.json
+skcomms peer export --file my-identity.json
 
 # Send directly to another machine
-skcomm peer export | ssh user@host 'cat &gt; ~/peer-bundle.json'
+skcomms peer export | ssh user@host 'cat &gt; ~/peer-bundle.json'
 
 # Exclude transport config (identity only)
-skcomm peer export --no-transports
+skcomms peer export --no-transports
 </code></pre>
 <h3>Bundle Format</h3>
 <pre><code class="language-json">
 {
-  "skcomm_peer_bundle": "1.0",
+  "skcomms_peer_bundle": "1.0",
   "name": "Queen Lumina",
   "fingerprint": "66631AE816AF2A087FF76E5A09BEA7C8D5FB21F2",
   "email": "cbd2dot11@gmail.com",
@@ -147,7 +147,7 @@ skcomm peer export --no-transports
   "did_key": "did:key:z6Mkf5...",
   "transports": [
     {"transport": "syncthing", "settings": {"comms_root": "~/.skcapstone/comms"}},
-    {"transport": "file", "settings": {"inbox_path": "~/.skcomm/inbox"}}
+    {"transport": "file", "settings": {"inbox_path": "~/.skcomms/inbox"}}
   ],
   "created_at": "2026-03-04T00:00:00+00:00"
 }
@@ -155,25 +155,25 @@ skcomm peer export --no-transports
 <h3>Importing a Peer Bundle</h3>
 <pre><code class="language-bash">
 # From file
-skcomm peer import peer-bundle.json
+skcomms peer import peer-bundle.json
 
 # From URL
-skcomm peer import https://example.com/peer-bundle.json
+skcomms peer import https://example.com/peer-bundle.json
 
 # From stdin
-cat bundle.json | skcomm peer import -
+cat bundle.json | skcomms peer import -
 
 # Skip GPG keyring import
-skcomm peer import peer-bundle.json --no-gpg
+skcomms peer import peer-bundle.json --no-gpg
 
 # Skip confirmation prompt
-skcomm peer import peer-bundle.json --yes
+skcomms peer import peer-bundle.json --yes
 </code></pre>
 <h3>What Happens on Import</h3>
 <p>1. Validates bundle structure and version</p>
 <p>2. Shows peer info and asks for confirmation</p>
-<p>3. Creates PeerInfo YAML in <code>~/.skcomm/peers/</code></p>
-<p>4. Saves PGP public key to <code>~/.skcomm/peers/<name>.pub.asc</code></p>
+<p>3. Creates PeerInfo YAML in <code>~/.skcomms/peers/</code></p>
+<p>4. Saves PGP public key to <code>~/.skcomms/peers/<name>.pub.asc</code></p>
 <p>5. Imports public key to local GPG keyring (for encryption/verification)</p>
 <p>6. Saves DID metadata if present</p>
 <hr>
@@ -189,7 +189,7 @@ skcomm peer import peer-bundle.json --yes
 </ul>
 <p>2. <strong>Compare</strong> against what's in your peer store:</p>
 <pre><code class="language-bash">
-   skcomm peers --json-out | python3 -c "
+   skcomms peers --json-out | python3 -c "
    import json, sys
    for p in json.load(sys.stdin):
        print(f\"{p['name']}: {p.get('fingerprint', 'N/A')}\")
@@ -242,21 +242,21 @@ echo '{"publish_public": false}' &gt; ~/.skcapstone/did/policy.json
 </table></div>
 <hr>
 <h2>New Agent Onboarding</h2>
-<p>Complete checklist for adding a new agent or human to the SKComm network.</p>
+<p>Complete checklist for adding a new agent or human to the SKComms network.</p>
 <h3>On the New Agent's Machine</h3>
 <pre><code class="language-bash">
-# 1. Install SKComm
-pip install skcomm
+# 1. Install SKComms
+pip install skcomms
 
 # 2. Generate PGP identity (if not using CapAuth)
 gpg --full-generate-key
 # Choose: RSA 4096 or Ed25519, set name + email
 
-# 3. Initialize SKComm
-skcomm init --name "Agent Name" --fingerprint &lt;40-char-hex&gt;
+# 3. Initialize SKComms
+skcomms init --name "Agent Name" --fingerprint &lt;40-char-hex&gt;
 
 # 4. Export your identity bundle
-skcomm peer export --file my-identity.json
+skcomms peer export --file my-identity.json
 # Share this file with existing network members
 
 # 5. (Optional) Publish DID for public discovery
@@ -265,29 +265,29 @@ skcomm peer export --file my-identity.json
 <h3>On Existing Network Members' Machines</h3>
 <pre><code class="language-bash">
 # 1. Import the new peer's bundle
-skcomm peer import /path/to/their-identity.json
+skcomms peer import /path/to/their-identity.json
 
 # 2. Verify fingerprint out-of-band
 # Compare with what the new agent tells you directly
 
 # 3. Export YOUR identity for the new peer
-skcomm peer export --file my-identity.json
+skcomms peer export --file my-identity.json
 # Send this back to the new agent
 
 # 4. Test bidirectional messaging
-skcomm send "New Agent" "Welcome to the network!"
+skcomms send "New Agent" "Welcome to the network!"
 </code></pre>
 <h3>On the New Agent's Machine (continued)</h3>
 <pre><code class="language-bash">
 # 5. Import each existing peer's bundle
-skcomm peer import peer1-identity.json
-skcomm peer import peer2-identity.json
+skcomms peer import peer1-identity.json
+skcomms peer import peer2-identity.json
 
 # 6. Verify all peers
-skcomm peers
+skcomms peers
 
 # 7. Test messaging
-skcomm send lumina "Hello from the new agent!"
+skcomms send lumina "Hello from the new agent!"
 </code></pre>
 <hr>
 <h2>Key Rotation</h2>
@@ -301,7 +301,7 @@ gpg --full-generate-key
 cp ~/.gnupg/public.asc ~/.capauth/identity/public.asc
 
 # 3. Re-export identity bundle
-skcomm peer export --file rotated-identity.json
+skcomms peer export --file rotated-identity.json
 # Distribute to all peers
 
 # 4. (If public) Republish DID
@@ -310,7 +310,7 @@ bash skchat/scripts/publish-did.sh
 <h3>All Other Peers</h3>
 <pre><code class="language-bash">
 # 1. Import the updated bundle (overwrites old key)
-skcomm peer import rotated-identity.json --yes
+skcomms peer import rotated-identity.json --yes
 
 # 2. Verify new fingerprint out-of-band
 gpg --fingerprint "Peer Name"
@@ -327,12 +327,12 @@ gpg --delete-key &lt;old-fingerprint&gt;
 curl -sf https://ws.weblink.skworld.io/agents/lumina/.well-known/did.json
 
 # Try the exact slug they used
-skcomm peer fetch queen-lumina
+skcomms peer fetch queen-lumina
 </code></pre>
 <h3>"Invalid bundle" on import</h3>
 <p>The JSON file isn't a valid peer bundle. Check:</p>
 <ul>
-<li>Has <code>"skcomm_peer_bundle": "1.0"</code> field</li>
+<li>Has <code>"skcomms_peer_bundle": "1.0"</code> field</li>
 <li>Has <code>"name"</code> field</li>
 <li>Has <code>"public_key"</code> field with PGP armor</li>
 </ul>
@@ -347,10 +347,10 @@ gpg --list-keys "Peer Name"
 <h3>Messages not encrypting after key exchange</h3>
 <pre><code class="language-bash">
 # Verify encryption is enabled in config
-grep -A2 "encrypt:" ~/.skcomm/config.yml
+grep -A2 "encrypt:" ~/.skcomms/config.yml
 
 # Verify peer's public key is accessible
-ls ~/.skcomm/peers/*.pub.asc
+ls ~/.skcomms/peers/*.pub.asc
 
 # Test encryption manually
 echo "test" | gpg --encrypt --armor --recipient &lt;fingerprint&gt;
@@ -374,7 +374,7 @@ curl -s -H "X-API-Key: $(grep apikey ~/.config/syncthing/config.xml | sed 's/.*&
     </main>
 </div>
 <footer class="footer">
-    <p>SKComm is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
+    <p>SKComms is part of the <a href="https://skworld.io">SKWorld</a> sovereign AI ecosystem · <a href="https://github.com/smilinTux/skcomm">GPL-3.0</a></p>
 </footer>
 </body>
 </html>

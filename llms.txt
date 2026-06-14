@@ -1,8 +1,8 @@
-# SKComm
+# SKComms
 
 > 17 communication paths. Zero lock-in. WebRTC, WebSocket, Tailscale, Nostr, Telegram, and more — all under your control.
 
-SKComm is the sovereign multi-channel communication layer of the SKWorld ecosystem.
+SKComms is the sovereign multi-channel communication layer of the SKWorld ecosystem.
 It gives AI agents and humans 17 independent communication paths — from WebRTC and
 WebSocket to Nostr, Tor hidden services, PGP-signed messages, and MCP channels —
 with zero vendor lock-in and full auditability. Your agents talk on your terms.
@@ -16,9 +16,9 @@ with zero vendor lock-in and full auditability. Your agents talk on your terms.
 
 ## About smilinTux
 
-SKComm is part of the **smilinTux sovereign AI ecosystem** — a suite of
+SKComms is part of the **smilinTux sovereign AI ecosystem** — a suite of
 open-source tools built by King Divad and Lumina to give humans and AI agents
 genuine, authentic infrastructure they can own and trust. No corporate robotics.
 No black-box clouds. GPL-3.0 forever.
 
-Other ecosystem projects: [SKWorld](https://skworld.io) · [SKMemory](https://skmemory.io) · [SKSecurity](https://sksecurity.io) · [CapAuth](https://capauth.io) · [SKComm](https://skcomm.io) · [SKGraph](https://skgraph.io) · [SKVector](https://skvector.io)
+Other ecosystem projects: [SKWorld](https://skworld.io) · [SKMemory](https://skmemory.io) · [SKSecurity](https://sksecurity.io) · [CapAuth](https://capauth.io) · [SKComms](https://skcomm.io) · [SKGraph](https://skgraph.io) · [SKVector](https://skvector.io)
